@@ -5,9 +5,7 @@ public class main {
         String carsFileName = "VEICULOS.txt";
         String parkingSpacesFileName = "VAGAS.txt";
         ParkingLot parkingLot = new ParkingLot();
-        parkingLot.importCarsFrom(carsFileName);
-        parkingLot.importParkingSpacesFrom(parkingSpacesFileName);
-        parkingLot.exportCarsTo(carsFileName);
-        parkingLot.exportParkingSpacesTo(parkingSpacesFileName);
+
+        parkingLot.run();
     }
 }
