@@ -130,7 +130,7 @@ public class ParkingLot {
                     option.getKey(),
                     option.getValue());
         }
-        System.out.print("What do you want to do: ");
+        System.out.print("O que você deseja fazer: ");
         String choice = mReader.readLine();
         return choice.trim().toLowerCase();
     }
@@ -157,7 +157,7 @@ public class ParkingLot {
                         System.out.println("Obrigado pela preferência!");
                         break;
                     default:
-                        System.out.printf("Unknown choice: '%s'. Try again. %n%n%n", choice);
+                        System.out.printf("Opção inválida: '%s'. Tente novamente. %n%n%n", choice);
                 }
             } catch (IOException ioe) {
                 System.out.println("Problema com a entrada do usuário. Contate o desenvolvedor!");

@@ -1,51 +1,38 @@
 package com.parkinglot.model;
 
 public class ParkingSpace {
-    private int id;
-    private double weight;
-    private double height;
-    private double length;
-    private double width;
-    private boolean occupied;
-    Car parkedCar;
+    private int mId;
+    private double mWeight;
+    private double mHeight;
+    private double mLength;
+    private double mWidth;
 
     public ParkingSpace(int id, double weight, double height, double length, double width) {
-        this.id = id;
-        this.weight = weight;
-        this.height = height;
-        this.length = length;
-        this.width = width;
+        this.mId = id;
+        this.mWeight = weight;
+        this.mHeight = height;
+        this.mLength = length;
+        this.mWidth = width;
     }
 
     public int getId() {
-        return id;
+        return mId;
     }
 
     public double getWeight() {
-        return weight;
+        return mWeight;
     }
 
     public double getHeight() {
-        return height;
+        return mHeight;
     }
 
     public double getLength() {
-        return length;
+        return mLength;
     }
 
     public double getWidth() {
-        return width;
+        return mWidth;
     }
 
-    public boolean isOccupied() {
-        return occupied;
-    }
-
-    public Car getParkedCar() {
-        return parkedCar;
-    }
-
-    public void setParkedCar(Car parkedCar) {
-        this.parkedCar = parkedCar;
-    }
 }

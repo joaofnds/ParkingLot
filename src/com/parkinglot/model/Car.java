@@ -1,43 +1,43 @@
 package com.parkinglot.model;
 
 public class Car {
-    private String model;
-    private int chassis;
-    private double weight;
-    private double height;
-    private double length;
-    private double width;
+    private String mModel;
+    private int mChassis;
+    private double mWeight;
+    private double mHeight;
+    private double mLength;
+    private double mWidth;
 
     public Car(String model, int chassis, double weight, double height, double length, double width) {
-        this.model = model;
-        this.chassis = chassis;
-        this.weight = weight;
-        this.height = height;
-        this.length = length;
-        this.width = width;
+        this.mModel = model;
+        this.mChassis = chassis;
+        this.mWeight = weight;
+        this.mHeight = height;
+        this.mLength = length;
+        this.mWidth = width;
     }
 
     public String getModel() {
-        return model;
+        return mModel;
     }
 
     public int getChassis() {
-        return chassis;
+        return mChassis;
     }
 
     public double getWeight() {
-        return weight;
+        return mWeight;
     }
 
     public double getHeight() {
-        return height;
+        return mHeight;
     }
 
     public double getLength() {
-        return length;
+        return mLength;
     }
 
     public double getWidth() {
-        return width;
+        return mWidth;
     }
 }
