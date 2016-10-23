@@ -4,21 +4,20 @@ import com.parkinglot.model.ParkingSpace;
 import com.parkinglot.model.Car;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ParkingLot {
     private List<ParkingSpace> mParkingSpaces;
     private List<Car> mCars;
-    private Map<String, String> mMenu;
+    private Map<String, String> mMenu; // Option, Description
+    private Map<Integer, Integer> mParkingRelations; // Chassis, Parking space ID
     private BufferedReader mReader;
 
     public ParkingLot() {
         this.mCars = new ArrayList<Car>();
         this.mParkingSpaces = new ArrayList<ParkingSpace>();
         this.mMenu = new LinkedHashMap<String, String>();
+        this.mParkingRelations = new HashMap<Integer, Integer>();
         mMenu.put("Abrir", "Iniciar ou continuar uma simulção");
         mMenu.put("Entrar", "Aloca uma vaga no estacionamento");
         mMenu.put("Pesquisar", "Encontra a vaga mais adequada ao veículo");
@@ -29,11 +28,15 @@ public class ParkingLot {
         this.mReader = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public void addCar(Car car) { this.mCars.add(car); }
+    private void addCar(Car car) { this.mCars.add(car); }
 
-    public void addParkingSpace(ParkingSpace parkingSpace) { this.mParkingSpaces.add(parkingSpace); }
+    private void addParkingSpace(ParkingSpace parkingSpace) { this.mParkingSpaces.add(parkingSpace); }
 
-    public void importCarsFrom(String filename) {
+    private void addParkingRelation(int chassis, int parkingSpaceID) {
+        this.mParkingRelations.put(chassis, parkingSpaceID);
+    }
+
+    private void importCarsFrom(String filename) {
         try (
                 FileInputStream fis = new FileInputStream(filename);
                 BufferedReader reader = new BufferedReader( new InputStreamReader(fis) );
@@ -58,20 +61,13 @@ public class ParkingLot {
         }
     }
 
-    public void exportCarsTo(String filename) {
+    private void exportCarsTo(String filename) {
         try (
                 FileOutputStream fos = new FileOutputStream(filename);
                 PrintWriter writer = new PrintWriter(fos);
         ) {
             for (Car car : this.mCars) {
-                writer.printf("%s,%d,%f,%f,%f,%f%n",
-                        car.getModel(),
-                        car.getChassis(),
-                        car.getWeight(),
-                        car.getHeight(),
-                        car.getLength(),
-                        car.getWidth()
-                );
+                writer.println(car);
             }
         } catch (IOException ioe) {
             System.out.printf("Problem saving %s%n", filename);
@@ -79,7 +75,7 @@ public class ParkingLot {
         }
     }
 
-    public void importParkingSpacesFrom(String filename) {
+    private void importParkingSpacesFrom(String filename) {
         try (
                 FileInputStream fis = new FileInputStream(filename);
                 BufferedReader reader = new BufferedReader( new InputStreamReader(fis) );
@@ -103,19 +99,13 @@ public class ParkingLot {
         }
     }
 
-    public void exportParkingSpacesTo(String filename) {
+    private void exportParkingSpacesTo(String filename) {
     	try (
     		FileOutputStream fos = new FileOutputStream(filename);
-    		PrintWriter write = new PrintWriter(fos);
+    		PrintWriter writer = new PrintWriter(fos);
     	) {
     		for (ParkingSpace ps : this.mParkingSpaces) {
-    			write.printf("%d,%f,%f,%f,%f%n",
-    				ps.getId(),
-                    ps.getWeight(),
-                    ps.getHeight(),
-                    ps.getLength(),
-                    ps.getWidth()
-                );
+    			writer.println(ps);
     		}
     	} catch (IOException ioe) {
             System.out.printf("Problems loading %s %n", filename);
@@ -165,10 +155,32 @@ public class ParkingLot {
 
     }
 
-    private boolean parkCar(int chassis, int parkingSpaceID) {
-        if ( !isParkable(chassis, parkingSpaceID) ) return false;
+    private boolean isParked(int chassis) {
+        return this.mParkingRelations.containsKey(chassis);
+    }
 
-        // TODO: implement actual 'parking'
+    private boolean isOccupied(int parkingSpaceID) {
+        return this.mParkingRelations.containsValue(parkingSpaceID);
+    }
+
+    private void showUnparkedCars() {
+        for ( Car car : this.mCars ) {
+            if ( !isParked(car.getChassis()))
+                System.out.println(car);
+        }
+    }
+
+    private void showFreeParkingSpaces() {
+        for ( ParkingSpace ps : this.mParkingSpaces ) {
+            if ( !isOccupied(ps.getId()) )
+                System.out.println(ps);
+        }
+    }
+
+    private boolean parkCar(int chassis, int parkingSpaceID) {
+        if ( !isParkable(chassis, parkingSpaceID)  || isParked(chassis) ) return false;
+
+        this.addParkingRelation(chassis, parkingSpaceID);
 
         return true;
     }

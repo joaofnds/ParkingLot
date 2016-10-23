@@ -35,4 +35,12 @@ public class ParkingSpace {
         return mWidth;
     }
 
+    @Override
+    public String toString() {
+        return  Integer.toString(this.getId()) + "," +
+                Double.toString(this.getWeight()) + "," +
+                Double.toString(this.getHeight()) + "," +
+                Double.toString(this.getLength()) + "," +
+                Double.toString(this.getWidth());
+    }
 }

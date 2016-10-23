@@ -40,4 +40,14 @@ public class Car {
     public double getWidth() {
         return mWidth;
     }
+
+    @Override
+    public String toString() {
+        return this.getModel() + "," +
+                Integer.toString(this.getChassis()) + "," +
+                Double.toString(this.getWeight()) + "," +
+                Double.toString(this.getHeight()) + "," +
+                Double.toString(this.getLength()) + "," +
+                Double.toString(this.getWidth());
+    }
 }
