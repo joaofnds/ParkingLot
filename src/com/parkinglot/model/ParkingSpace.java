@@ -43,4 +43,17 @@ public class ParkingSpace {
                 Double.toString(this.getLength()) + "," +
                 Double.toString(this.getWidth());
     }
+
+    public String pretty() {
+        return java.lang.String.format("Vaga ID: %s%n" +
+                        "\tPeso: %.1f%n" +
+                        "\tAltura: %.1f%n" +
+                        "\tComprimento: %.1f%n" +
+                        "\tLargura: %.1f%n",
+                            getId(),
+                            getWeight(),
+                            getHeight(),
+                            getLength(),
+                            getWidth());
+    }
 }

@@ -50,4 +50,19 @@ public class Car {
                 Double.toString(this.getLength()) + "," +
                 Double.toString(this.getWidth());
     }
+
+    public String pretty() {
+        return  java.lang.String.format("Nome: %s%n" +
+                                            "\tNúmero de chassi: %d%n" +
+                                            "\tPeso: %.1f%n" +
+                                            "\tAltura: %.1f%n" +
+                                            "\tComprimento: %.1f%n" +
+                                            "\tlargura: %.1f%n",
+                                            getModel(),
+                                            getChassis(),
+                                            getWeight(),
+                                            getHeight(),
+                                            getLength(),
+                                            getWidth());
+    }
 }

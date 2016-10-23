@@ -12,6 +12,7 @@ public class ParkingLot {
     private Map<String, String> mMenu; // Option, Description
     private Map<Integer, Integer> mParkingRelations; // Chassis, Parking space ID
     private BufferedReader mReader;
+    private Scanner mScanner;
 
     public ParkingLot() {
         this.mCars = new ArrayList<Car>();
@@ -26,6 +27,7 @@ public class ParkingLot {
         mMenu.put("Relatórios", "Gera relatórios sobre o estacionamento");
         mMenu.put("Fim", "Encerra a aplicação");
         this.mReader = new BufferedReader(new InputStreamReader(System.in));
+        this.mScanner = new Scanner(System.in);
     }
 
     private void addCar(Car car) { this.mCars.add(car); }
@@ -56,7 +58,7 @@ public class ParkingLot {
                 );
             }
         } catch (IOException ioe) {
-            System.out.printf("Problems loading %s %n", filename);
+            System.out.printf("Problema ao carregar '%s' %n", filename);
             ioe.printStackTrace();
         }
     }
@@ -114,21 +116,80 @@ public class ParkingLot {
     }
 
     private String promptAction() throws IOException {
-        System.out.println("Bem vindo ao estacionamento. Estas são as ações que você pode tomar: ");
+        System.out.println("-------------------------- MENU --------------------------");
         for (Map.Entry<String, String> option : mMenu.entrySet()) {
             System.out.printf("%s - %s%n",
                     option.getKey(),
                     option.getValue());
         }
+        System.out.println("----------------------------------------------------------");
         System.out.print("O que você deseja fazer: ");
         String choice = mReader.readLine();
         return choice.trim().toLowerCase();
+    }
+
+    private void promptOpen() {
+
+        System.out.println("Recuperando arquivos de simulação...");
+        importCarsFrom("VEICULOS.txt");
+        importParkingSpacesFrom("VAGAS.txt");
+        System.out.println("Recuperação de arquivos concluída com sucesso!");
+
+        String choice = "";
+        do {
+            try {
+                System.out.println("Deseja iniciar uma nova simulação? (y/n)");
+                choice = mReader.readLine().trim().toLowerCase();
+            } catch ( IOException ioe ) {
+                System.out.printf("Problema com a entrada '%s'%n", choice);
+                ioe.printStackTrace();
+            }
+        } while( !choice.equals("y") && !choice.equals("n") );
+
+        if ( choice == "y" ) {
+            System.out.println("Carros disponíveis para a nova simulação:");
+            showUnparkedCars();
+            showFreeParkingSpaces();
+        } else {
+            System.out.println("Carregando a última simulação...");
+            // TODO: load last simulation
+        }
+
+    }
+
+    private int promptCarChassis() {
+        System.out.print("Informe o número de chassi do carro: ");
+        return mScanner.nextInt();
+    }
+
+    private String promptPark() {
+        int chassis = promptCarChassis();
+        System.out.print("Informe o ID da vaga: ");
+        int psID = mScanner.nextInt();
+        return chassis + "," + psID;
+    }
+
+    private void promptSearch() {
+        int chassis = promptCarChassis();
+        ParkingSpace bestPS = findParkingSpaceByCar(findCarByChassis(chassis));
+        if ( bestPS == null )
+            System.out.printf("Não foi possível encontrar uma vaga para o veículo com o número de chassi '%d'%n", chassis);
+        else
+            System.out.printf("A melhor vaga para seu veículo é:%n%s", bestPS.pretty());
     }
 
     private ParkingSpace findParkingSpaceByID(int id) {
         for ( ParkingSpace ps : this.mParkingSpaces ) {
             if ( ps.getId() == id ) return ps;
         }
+        return null;
+    }
+
+    private ParkingSpace findParkingSpaceByCar(Car car) {
+        if ( !isParked(car.getChassis()) )
+            for ( ParkingSpace ps : mParkingSpaces )
+                if ( isParkable(car.getChassis(), ps.getId()) )
+                    return ps;
         return null;
     }
 
@@ -164,20 +225,43 @@ public class ParkingLot {
     }
 
     private void showUnparkedCars() {
+        System.out.println("----------------------- Lista de Carros não estacionados -----------------------");
         for ( Car car : this.mCars ) {
-            if ( !isParked(car.getChassis()))
-                System.out.println(car);
+            if ( this.mCars.indexOf(car) > 10 ) break;
+            if ( !isParked(car.getChassis())) {
+                String[] carInfo = car.toString().split(",");
+                System.out.println(car.pretty());
+            }
         }
+        System.out.println("--------------------------------------------------------------------------------");
     }
 
     private void showFreeParkingSpaces() {
+        System.out.println("-------------------------- Lista de vagas desocupadas --------------------------");
         for ( ParkingSpace ps : this.mParkingSpaces ) {
-            if ( !isOccupied(ps.getId()) )
-                System.out.println(ps);
+            if ( this.mParkingSpaces.indexOf(ps) > 10 ) break;
+            if ( !isOccupied(ps.getId()) ) {
+                String[] psInfo = ps.toString().split(",");
+                System.out.println(ps.pretty());
+                                }
         }
+        System.out.println("--------------------------------------------------------------------------------");
     }
 
-    private boolean parkCar(int chassis, int parkingSpaceID) {
+    private boolean parkCar() {
+        if ( mCars.isEmpty() || mParkingSpaces.isEmpty() ) {
+            System.out.println("Abra o programa primeiro!");
+            return false;
+        }
+
+        showUnparkedCars();
+        showFreeParkingSpaces();
+
+        String[] response = promptPark().split(",");
+        int chassis = Integer.parseInt(response[0]);
+        int parkingSpaceID = Integer.parseInt(response[1]);
+
+
         if ( !isParkable(chassis, parkingSpaceID)  || isParked(chassis) ) return false;
 
         this.addParkingRelation(chassis, parkingSpaceID);
@@ -192,10 +276,16 @@ public class ParkingLot {
                 choice = promptAction();
                 switch (choice) {
                     case "abrir":
+                        promptOpen();
                         break;
                     case "entrar":
+                        if( parkCar() )
+                            System.out.println("Carro estacionado com sucesso!");
+                        else
+                            System.out.println("Não foi possível estacionar o carro!");
                         break;
                     case "pesquisar":
+                        promptSearch();
                         break;
                     case "sair":
                         break;
