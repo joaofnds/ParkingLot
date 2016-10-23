@@ -135,6 +135,44 @@ public class ParkingLot {
         return choice.trim().toLowerCase();
     }
 
+    private ParkingSpace findParkingSpaceByID(int id) {
+        for ( ParkingSpace ps : this.mParkingSpaces ) {
+            if ( ps.getId() == id ) return ps;
+        }
+        return null;
+    }
+
+    private Car findCarByChassis(int chassis) {
+        for ( Car car : this.mCars ) {
+            if ( car.getChassis() == chassis )  return car;
+        }
+        return null;
+    }
+
+    private boolean isParkable(int chassis, int parkingSpaceID) {
+        Car car = findCarByChassis(chassis);
+        ParkingSpace parkingSpace = findParkingSpaceByID(parkingSpaceID);
+
+        if (car.equals(null)) {
+            System.out.printf("Não foi possível encontrar um carro com o número de chassi '%d'.", chassis);
+            return false;
+        }
+
+        return car.getWeight() <= parkingSpace.getWeight() &&
+               car.getHeight() <= parkingSpace.getHeight() &&
+               car.getLength() <= parkingSpace.getLength() &&
+               car.getWidth() <= parkingSpace.getWidth();
+
+    }
+
+    private boolean parkCar(int chassis, int parkingSpaceID) {
+        if ( !isParkable(chassis, parkingSpaceID) ) return false;
+
+        // TODO: implement actual 'parking'
+
+        return true;
+    }
+
     public void run() { // TODO: implement menu functionality
         String choice = "";
         do {
