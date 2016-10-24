@@ -162,10 +162,18 @@ public class ParkingLot {
 
     private String promptLeave() {
         showCars(true);
-        System.out.print("Informe o número de chassi do veículo que deseja retirar: ");
-        int chassis = mScanner.nextInt();
-        int psID = findParkingSpaceByCar(findCarByChassis(chassis)).getId();
-        return chassis + "," + psID;
+
+        int chassis = promptCarChassis();
+
+        Car car = findCarByChassis(chassis);
+        if ( car == null )
+            return "null,null";
+
+        ParkingSpace ps = findParkingRelationByCar(car);
+        if ( ps == null )
+            return chassis + ",null";
+
+        return chassis + "," + ps.getId();
     }
 
     private int promptCarChassis() {
@@ -173,16 +181,25 @@ public class ParkingLot {
         return mScanner.nextInt();
     }
 
-    private String promptPark() {
-        int chassis = promptCarChassis();
+    private int promptParkingSpaceID() {
         System.out.print("Informe o ID da vaga: ");
-        int psID = mScanner.nextInt();
+        return mScanner.nextInt();
+    }
+
+    private String promptParking() {
+        int chassis = promptCarChassis();
+        int psID = promptParkingSpaceID();
         return chassis + "," + psID;
     }
 
     private void promptSearch() {
         int chassis = promptCarChassis();
-        ParkingSpace bestPS = findParkingSpaceByCar(findCarByChassis(chassis));
+        Car car = findCarByChassis(chassis);
+        if ( car == null ) {
+            System.out.printf("Não foi possível encontrar o veículo com o número de chassi '%d'%n", chassis);
+            return;
+        }
+        ParkingSpace bestPS = findParkingSpaceByCar(car);
         if ( bestPS == null )
             System.out.printf("Não foi possível encontrar uma vaga para o veículo com o número de chassi '%d'%n", chassis);
         else
@@ -204,6 +221,12 @@ public class ParkingLot {
         return null;
     }
 
+    private ParkingSpace findParkingRelationByCar(Car car) {
+        if ( car == null ) return null;
+        int psID = mParkingRelations.get(car.getChassis());
+        return findParkingSpaceByID(psID);
+    }
+
     private Car findCarByChassis(int chassis) {
         for ( Car car : this.mCars ) {
             if ( car.getChassis() == chassis )  return car;
@@ -213,10 +236,16 @@ public class ParkingLot {
 
     private boolean isParkable(int chassis, int parkingSpaceID) {
         Car car = findCarByChassis(chassis);
+
+        if (car == null) {
+            System.out.printf("Não foi possível encontrar um verículo com o número de chassi '%d'.%n", chassis);
+            return false;
+        }
+
         ParkingSpace parkingSpace = findParkingSpaceByID(parkingSpaceID);
 
-        if (car.equals(null)) {
-            System.out.printf("Não foi possível encontrar um carro com o número de chassi '%d'.", chassis);
+        if ( parkingSpace == null ) {
+            System.out.printf("Não foi possível encontrar a vaga de ID '%d'.%n", parkingSpaceID);
             return false;
         }
 
@@ -271,7 +300,7 @@ public class ParkingLot {
         showCars(false);
         showFreeParkingSpaces();
 
-        String[] response = promptPark().split(",");
+        String[] response = promptParking().split(",");
         int chassis = Integer.parseInt(response[0]);
         int psID = Integer.parseInt(response[1]);
 
@@ -294,6 +323,17 @@ public class ParkingLot {
         showCars(true);
 
         String[] response = promptLeave().split(",");
+
+        if( response[0].equals("null") ) {
+            System.out.println("Veículo não encontrado!%n");
+            return false;
+        }
+
+        if ( response[1].equals("null") ) {
+            System.out.printf("Não há nenhuma vaga associada ao veículo de chassi '%s'!%n", response[0]);
+            return false;
+        }
+
         int chassis = Integer.parseInt(response[0]);
         int psID = Integer.parseInt(response[1]);
         if ( isParked(chassis) ) {
@@ -328,8 +368,10 @@ public class ParkingLot {
                         unparkCar();
                         break;
                     case "salvar":
+                        // TODO: save parking relations
                         break;
                     case "relatorios":
+                        // TODO: generate logs
                         break;
                     case "fim":
                         System.out.println("Obrigado pela preferência!");
