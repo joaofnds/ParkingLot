@@ -1,5 +1,6 @@
 package com.parkinglot;
 
+import com.parkinglot.model.ParkingLog;
 import com.parkinglot.model.ParkingSpace;
 import com.parkinglot.model.Car;
 
@@ -9,6 +10,7 @@ import java.util.*;
 public class ParkingLot {
     private List<ParkingSpace> mParkingSpaces;
     private List<Car> mCars;
+    private List<ParkingLog> mParkingLogs;
     private Map<String, String> mMenu; // Option, Description
     private Map<Integer, Integer> mParkingRelations; // Chassis, Parking space ID
     private BufferedReader mReader;
@@ -17,6 +19,7 @@ public class ParkingLot {
     public ParkingLot() {
         this.mCars = new ArrayList<Car>();
         this.mParkingSpaces = new ArrayList<ParkingSpace>();
+        this.mParkingLogs = new ArrayList<ParkingLog>();
         this.mMenu = new LinkedHashMap<String, String>();
         this.mParkingRelations = new HashMap<Integer, Integer>();
         mMenu.put("Abrir", "Iniciar ou continuar uma simulção");
@@ -148,13 +151,21 @@ public class ParkingLot {
 
         if ( choice == "y" ) {
             System.out.println("Carros disponíveis para a nova simulação:");
-            showUnparkedCars();
+            showCars(false);
             showFreeParkingSpaces();
         } else {
             System.out.println("Carregando a última simulação...");
             // TODO: load last simulation
         }
 
+    }
+
+    private String promptLeave() {
+        showCars(true);
+        System.out.print("Informe o número de chassi do veículo que deseja retirar: ");
+        int chassis = mScanner.nextInt();
+        int psID = findParkingSpaceByCar(findCarByChassis(chassis)).getId();
+        return chassis + "," + psID;
     }
 
     private int promptCarChassis() {
@@ -224,11 +235,14 @@ public class ParkingLot {
         return this.mParkingRelations.containsValue(parkingSpaceID);
     }
 
-    private void showUnparkedCars() {
-        System.out.println("----------------------- Lista de Carros não estacionados -----------------------");
+    private void showCars(boolean parked) {
+        if ( parked )
+            System.out.println("----------------------- Lista de Carros estacionados ---------------------------");
+        else
+            System.out.println("----------------------- Lista de Carros não estacionados -----------------------");
         for ( Car car : this.mCars ) {
             if ( this.mCars.indexOf(car) > 10 ) break;
-            if ( !isParked(car.getChassis())) {
+            if ( isParked(car.getChassis()) == parked ) {
                 String[] carInfo = car.toString().split(",");
                 System.out.println(car.pretty());
             }
@@ -254,19 +268,42 @@ public class ParkingLot {
             return false;
         }
 
-        showUnparkedCars();
+        showCars(false);
         showFreeParkingSpaces();
 
         String[] response = promptPark().split(",");
         int chassis = Integer.parseInt(response[0]);
-        int parkingSpaceID = Integer.parseInt(response[1]);
+        int psID = Integer.parseInt(response[1]);
 
+        if ( !isParkable(chassis, psID)  || isParked(chassis) ) {
+            mParkingLogs.add(new ParkingLog(true, false, chassis, psID));
+            return false;
+        }
 
-        if ( !isParkable(chassis, parkingSpaceID)  || isParked(chassis) ) return false;
-
-        this.addParkingRelation(chassis, parkingSpaceID);
-
+        this.addParkingRelation(chassis, psID);
+        mParkingLogs.add(new ParkingLog(true, true, chassis, psID));
         return true;
+    }
+
+    private boolean unparkCar() {
+        if ( mCars.isEmpty() || mParkingSpaces.isEmpty() ) {
+            System.out.println("Abra o programa primeiro!");
+            return false;
+        }
+
+        showCars(true);
+
+        String[] response = promptLeave().split(",");
+        int chassis = Integer.parseInt(response[0]);
+        int psID = Integer.parseInt(response[1]);
+        if ( isParked(chassis) ) {
+            mParkingRelations.remove(chassis);
+            mParkingLogs.add(new ParkingLog(false, true, chassis, psID));
+            return true;
+        } else {
+            mParkingLogs.add(new ParkingLog(false, false, chassis, psID));
+            return false;
+        }
     }
 
     public void run() { // TODO: implement menu functionality
@@ -288,6 +325,7 @@ public class ParkingLot {
                         promptSearch();
                         break;
                     case "sair":
+                        unparkCar();
                         break;
                     case "salvar":
                         break;
