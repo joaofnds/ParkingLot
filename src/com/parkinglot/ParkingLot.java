@@ -231,7 +231,7 @@ public class ParkingLot {
             showFreeParkingSpaces();
         } else {
             System.out.println("Carregando a última simulação...");
-            // TODO: load last simulation
+            importParkingSpacesFrom("RELATIONS.txt");
         }
 
     }
@@ -422,7 +422,7 @@ public class ParkingLot {
         }
     }
 
-    public void run() { // TODO: implement menu functionality
+    public void run() {
         String choice = "";
         do {
             try {
@@ -444,7 +444,7 @@ public class ParkingLot {
                         unparkCar();
                         break;
                     case "salvar":
-                        // TODO: save parking relations
+                        exportRelationsto("RELATIONS.txt");
                         break;
                     case "relatorios":
                         // TODO: generate logs
