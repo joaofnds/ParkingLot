@@ -3,7 +3,6 @@ package com.parkinglot;
 import com.parkinglot.model.ParkingLog;
 import com.parkinglot.model.ParkingSpace;
 import com.parkinglot.model.Car;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.io.*;
 import java.util.*;
@@ -156,6 +155,40 @@ public class ParkingLot {
                 writer.println(log);
             }
         } catch (IOException ioe) {
+            System.out.printf("Problema ao carregar o arquivo '%s'%n", filename);
+            ioe.printStackTrace();
+        }
+    }
+
+    private void importRelationsFrom(String filename) {
+        try (
+                FileInputStream fis = new FileInputStream(filename);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+        ) {
+            String line;
+            while ( (line = reader.readLine()) != null ) {
+                String[] args = line.split(",");
+                addParkingRelation(
+                        Integer.parseInt(args[0]),
+                        Integer.parseInt(args[1])
+                );
+            }
+        } catch ( IOException ioe ) {
+            System.out.printf("Erro ao importar o arquivo '%s'%n", filename);
+            ioe.printStackTrace();
+        }
+    }
+
+    private void exportRelationsto(String filename) {
+        try (
+                FileOutputStream fos = new FileOutputStream(filename);
+                PrintWriter writer = new PrintWriter(fos);
+        ) {
+            for (Object o : mParkingRelations.entrySet()) {
+                Map.Entry rel = (Map.Entry) o;
+                writer.println(rel.getKey() + "," + rel.getValue());
+            }
+        } catch ( IOException ioe ) {
             System.out.printf("Problema ao carregar o arquivo '%s'%n", filename);
             ioe.printStackTrace();
         }
