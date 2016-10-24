@@ -5,6 +5,7 @@ import com.parkinglot.model.ParkingSpace;
 import com.parkinglot.model.Car;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ParkingLot {
@@ -132,8 +133,8 @@ public class ParkingLot {
                 String[] args = line.split(",");
                 this.addParkingLog(
                         new ParkingLog(
-                                Boolean.parseBoolean(args[0]),
-                                Boolean.parseBoolean(args[1]),
+                                args[0].equals("entrada"),
+                                args[1].equals("sucesso"),
                                 Integer.parseInt(args[2]),
                                 Integer.parseInt(args[3]),
                                 Long.parseLong(args[4])
@@ -179,7 +180,7 @@ public class ParkingLot {
         }
     }
 
-    private void exportRelationsto(String filename) {
+    private void exportRelationsTo(String filename) {
         try (
                 FileOutputStream fos = new FileOutputStream(filename);
                 PrintWriter writer = new PrintWriter(fos);
@@ -231,7 +232,8 @@ public class ParkingLot {
             showFreeParkingSpaces();
         } else {
             System.out.println("Carregando a última simulação...");
-            importParkingSpacesFrom("RELATIONS.txt");
+            importRelationsFrom("RELATIONS.txt");
+            importLogsFrom("LOGS.txt");
         }
 
     }
@@ -422,6 +424,39 @@ public class ParkingLot {
         }
     }
 
+    private void generateReport (String filename) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
+        String currentDate = sdf.format(new Date().getTime());
+
+        try (
+                FileOutputStream fos = new FileOutputStream(filename);
+                PrintWriter writer = new PrintWriter(fos);
+        ) {
+            writer.printf("Relação da quantidade de carros estacionados por vaga no dia %s%n" +
+                          "===%n", currentDate);
+            for ( ParkingSpace ps : mParkingSpaces ) {
+                int successParks = 0;
+                int failedParks = 0;
+                for ( ParkingLog parkingLog : mParkingLogs ) {
+                    if ( parkingLog.getParkingSpaceID() == ps.getId() &&
+                         parkingLog.getOperation() &&
+                         currentDate.equals(sdf.format( parkingLog.getTime() )) ) {
+                        if ( parkingLog.getStatus() )
+                            successParks += 1;
+                        else if ( !parkingLog.getStatus() )
+                            failedParks += 1;
+                    }
+                }
+                writer.printf(">* Vaga %d%n", ps.getId());
+                writer.printf("> %d %s com sucesso%n", successParks, successParks == 1 ? "carro estacionou" : "carros estacionaram");
+                writer.printf("> %d %s tentaram sem êxito%n", failedParks, failedParks == 1 ? "carro" : "carros");
+            }
+        } catch ( IOException ioe ) {
+            System.out.printf("Não foi possível abrir o arquivo '%s'%n", filename);
+            ioe.printStackTrace();
+        }
+    }
+
     public void run() {
         String choice = "";
         do {
@@ -444,10 +479,12 @@ public class ParkingLot {
                         unparkCar();
                         break;
                     case "salvar":
-                        exportRelationsto("RELATIONS.txt");
+                        exportRelationsTo("RELATIONS.txt");
+                        exportLogsTo("LOGS.txt");
+                        System.out.println("Arquivos salvos com sucesso!");
                         break;
                     case "relatorios":
-                        // TODO: generate logs
+                        generateReport("REPORT.md");
                         break;
                     case "fim":
                         System.out.println("Obrigado pela preferência!");

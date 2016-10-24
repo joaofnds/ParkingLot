@@ -40,7 +40,7 @@ public class ParkingLog {
 
     @Override
     public String toString() {
-        return java.lang.String.format("%s,%s,%s,%s,%s%n",
+        return java.lang.String.format("%s,%s,%s,%s,%s",
                 getOperation() ? "entrada" : "saída",
                 getStatus() ? "sucesso" : "falha",
                 Integer.toString(getCarChassis()),
@@ -49,7 +49,7 @@ public class ParkingLog {
     }
 
     public String pretty() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         return java.lang.String.format("Operação: %s" +
                 "\tResultado: %s%n" +
                 "\tNúmero de chassi: %d%n" +
@@ -62,4 +62,5 @@ public class ParkingLog {
                 sdf.format(getTime())
         );
     }
+
 }
