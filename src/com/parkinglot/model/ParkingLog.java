@@ -7,14 +7,14 @@ public class ParkingLog {
     private boolean mSucceed;
     private int mCarChassis;
     private int mParkingSpaceID;
-    private Date mTime;
+    private long mTime;
 
     public ParkingLog(boolean mEntering, boolean mSucceed, int mCarChassis, int mParkingSpaceID) {
         this.mEntering = mEntering;
         this.mSucceed = mSucceed;
         this.mCarChassis = mCarChassis;
         this.mParkingSpaceID = mParkingSpaceID;
-        this.mTime = new Date();
+        this.mTime = new Date().getTime();
     }
 
     public boolean getOperation() {
@@ -33,7 +33,7 @@ public class ParkingLog {
         return mParkingSpaceID;
     }
 
-    public Date getTime() {
+    public long getTime() {
         return mTime;
     }
 
@@ -44,6 +44,6 @@ public class ParkingLog {
                 getStatus() ? "sucesso" : "falha",
                 Integer.toString(getCarChassis()),
                 Integer.toString(getParkingSpaceID()),
-                getTime().toString());
+                Long.toString(getTime()) );
     }
 }
