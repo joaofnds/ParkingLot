@@ -3,6 +3,7 @@ package com.parkinglot;
 import com.parkinglot.model.ParkingLog;
 import com.parkinglot.model.ParkingSpace;
 import com.parkinglot.model.Car;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.io.*;
 import java.util.*;
@@ -39,6 +40,10 @@ public class ParkingLot {
 
     private void addParkingRelation(int chassis, int parkingSpaceID) {
         this.mParkingRelations.put(chassis, parkingSpaceID);
+    }
+
+    private void addParkingLog(ParkingLog log) {
+        mParkingLogs.add(log);
     }
 
     private void importCarsFrom(String filename) {
@@ -99,7 +104,7 @@ public class ParkingLot {
                 );
             }
         } catch (IOException ioe) {
-            System.out.printf("Problems loading %s %n", filename);
+            System.out.printf("Erro ao importar o arquivo '%s' %n", filename);
             ioe.printStackTrace();
         }
     }
@@ -113,8 +118,46 @@ public class ParkingLot {
     			writer.println(ps);
     		}
     	} catch (IOException ioe) {
-            System.out.printf("Problems loading %s %n", filename);
+            System.out.printf("Problema ao carregar o arquivo '%s' %n", filename);
             ioe.printStackTrace();;
+        }
+    }
+
+    private void importLogsFrom(String filename) {
+        try (
+                FileInputStream fis = new FileInputStream(filename);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+        ) {
+            String line;
+            while ( (line = reader.readLine()) != null ) {
+                String[] args = line.split(",");
+                this.addParkingLog(
+                        new ParkingLog(
+                                Boolean.parseBoolean(args[0]),
+                                Boolean.parseBoolean(args[1]),
+                                Integer.parseInt(args[2]),
+                                Integer.parseInt(args[3]),
+                                Long.parseLong(args[4])
+                        )
+                );
+            }
+        } catch ( IOException ioe ) {
+            System.out.printf("Erro ao importar o arquivo '%s' %n", filename);
+            ioe.printStackTrace();
+        }
+    }
+
+    private void exportLogsTo(String filename) {
+        try (
+                FileOutputStream fos = new FileOutputStream(filename);
+                PrintWriter writer = new PrintWriter(fos);
+        ) {
+            for ( ParkingLog log : mParkingLogs ) {
+                writer.println(log);
+            }
+        } catch (IOException ioe) {
+            System.out.printf("Problema ao carregar o arquivo '%s'%n", filename);
+            ioe.printStackTrace();
         }
     }
 
@@ -305,12 +348,12 @@ public class ParkingLot {
         int psID = Integer.parseInt(response[1]);
 
         if ( !isParkable(chassis, psID)  || isParked(chassis) ) {
-            mParkingLogs.add(new ParkingLog(true, false, chassis, psID));
+            mParkingLogs.add(new ParkingLog(true, false, chassis, psID, new Date().getTime()));
             return false;
         }
 
         this.addParkingRelation(chassis, psID);
-        mParkingLogs.add(new ParkingLog(true, true, chassis, psID));
+        mParkingLogs.add(new ParkingLog(true, true, chassis, psID, new Date().getTime()));
         return true;
     }
 
@@ -338,10 +381,10 @@ public class ParkingLot {
         int psID = Integer.parseInt(response[1]);
         if ( isParked(chassis) ) {
             mParkingRelations.remove(chassis);
-            mParkingLogs.add(new ParkingLog(false, true, chassis, psID));
+            mParkingLogs.add(new ParkingLog(false, true, chassis, psID, new Date().getTime()));
             return true;
         } else {
-            mParkingLogs.add(new ParkingLog(false, false, chassis, psID));
+            mParkingLogs.add(new ParkingLog(false, false, chassis, psID, new Date().getTime()));
             return false;
         }
     }

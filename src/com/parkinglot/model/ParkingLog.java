@@ -1,5 +1,6 @@
 package com.parkinglot.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ParkingLog {
@@ -9,12 +10,12 @@ public class ParkingLog {
     private int mParkingSpaceID;
     private long mTime;
 
-    public ParkingLog(boolean mEntering, boolean mSucceed, int mCarChassis, int mParkingSpaceID) {
-        this.mEntering = mEntering;
-        this.mSucceed = mSucceed;
-        this.mCarChassis = mCarChassis;
-        this.mParkingSpaceID = mParkingSpaceID;
-        this.mTime = new Date().getTime();
+    public ParkingLog(boolean Entering, boolean Succeed, int CarChassis, int ParkingSpaceID, long time) {
+        this.mEntering = Entering;
+        this.mSucceed = Succeed;
+        this.mCarChassis = CarChassis;
+        this.mParkingSpaceID = ParkingSpaceID;
+        this.mTime = time;
     }
 
     public boolean getOperation() {
@@ -45,5 +46,20 @@ public class ParkingLog {
                 Integer.toString(getCarChassis()),
                 Integer.toString(getParkingSpaceID()),
                 Long.toString(getTime()) );
+    }
+
+    public String pretty() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        return java.lang.String.format("Operação: %s" +
+                "\tResultado: %s%n" +
+                "\tNúmero de chassi: %d%n" +
+                "\tID da vaga: %d%n" +
+                "\tHorário: %s%n",
+                getOperation() ? "Entrada" : "Saída",
+                getStatus() ? "Sucesso" : "Falha",
+                getCarChassis(),
+                getParkingSpaceID(),
+                sdf.format(getTime())
+        );
     }
 }
