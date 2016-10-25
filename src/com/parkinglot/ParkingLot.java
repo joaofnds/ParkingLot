@@ -434,6 +434,8 @@ public class ParkingLot {
         ) {
             writer.printf("Relação da quantidade de carros estacionados por vaga no dia %s%n" +
                           "===%n", currentDate);
+            writer.println("| ID da vaga | Carros estacionados | Tentativas Falhas |");
+            writer.println("| -: | :-: | :- |");
             for ( ParkingSpace ps : mParkingSpaces ) {
                 int successParks = 0;
                 int failedParks = 0;
@@ -447,9 +449,7 @@ public class ParkingLot {
                             failedParks += 1;
                     }
                 }
-                writer.printf(">* Vaga %d%n", ps.getId());
-                writer.printf("> %d %s com sucesso%n", successParks, successParks == 1 ? "carro estacionou" : "carros estacionaram");
-                writer.printf("> %d %s tentaram sem êxito%n", failedParks, failedParks == 1 ? "carro" : "carros");
+                writer.printf("| %d | %d | %d |%n", ps.getId(), successParks, failedParks);
             }
         } catch ( IOException ioe ) {
             System.out.printf("Não foi possível abrir o arquivo '%s'%n", filename);
