@@ -432,6 +432,7 @@ public class ParkingLot {
                 FileOutputStream fos = new FileOutputStream(filename);
                 PrintWriter writer = new PrintWriter(fos);
         ) {
+            // Report about the amount of parked cars by parking space.
             writer.printf("Relação da quantidade de carros estacionados por vaga no dia %s%n" +
                           "===%n", currentDate);
             writer.printf("| ID da vaga | Carros estacionados | Tentativas Falhas |%n");
@@ -451,6 +452,18 @@ public class ParkingLot {
                 }
                 writer.printf("| %d | %d | %d |%n", ps.getId(), successParks, failedParks);
             }
+
+            // TODO: report about the total amount of cars parked by category(long,short,heavy,light,tall,low,wide,narrow)
+            // O total de veículos estacionados hoje, longos, curtos, pesados, leves, altos, baixos, largos, estreitos.
+            // Um veículo é pesado se tiver peso igual ou superior a 2500 kg. Um veículo é longo se tiver
+            // comprimento igual ou superior a 2,5 metros. Um veículo é largo se tiver largura maior ou igual a 1,6
+            // metros. Um veículo é alto se tiver altura maior ou igual a 1,7 metros.
+
+            // TODO: report about the total amount by decreasing order os specs(weight, height, length, width)
+            // A lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e
+            // largura, nesta ordem. Ou seja, se dois veículos, a e b, pesarem 3500 kg, mas a tem 1,6 m de altura e
+            // b tem 2 m de altura, b deve aparecer antes que a.
+
         } catch ( IOException ioe ) {
             System.out.printf("Não foi possível abrir o arquivo '%s'%n", filename);
             ioe.printStackTrace();
