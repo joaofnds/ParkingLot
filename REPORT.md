@@ -1,7 +1,7 @@
 Relação da quantidade de carros estacionados por vaga no dia 24/10/2016
 ===
 | ID da vaga | Carros estacionados | Tentativas Falhas |
-| -: | :-: | :- |
+| ---------: | :-----------------: | :---------------: |
 | 101 | 0 | 0 |
 | 102 | 0 | 0 |
 | 103 | 0 | 0 |

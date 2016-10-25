@@ -434,8 +434,8 @@ public class ParkingLot {
         ) {
             writer.printf("Relação da quantidade de carros estacionados por vaga no dia %s%n" +
                           "===%n", currentDate);
-            writer.println("| ID da vaga | Carros estacionados | Tentativas Falhas |");
-            writer.println("| -: | :-: | :- |");
+            writer.printf("| ID da vaga | Carros estacionados | Tentativas Falhas |%n");
+            writer.printf("| ---------: | :-----------------: | :---------------: |%n");
             for ( ParkingSpace ps : mParkingSpaces ) {
                 int successParks = 0;
                 int failedParks = 0;
