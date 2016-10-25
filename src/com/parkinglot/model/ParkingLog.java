@@ -1,7 +1,6 @@
 package com.parkinglot.model;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ParkingLog {
 	private boolean mEntering;
@@ -18,11 +17,11 @@ public class ParkingLog {
 		this.mTime = time;
 	}
 
-	public boolean getOperation() {
+	public boolean isEntering() {
 		return mEntering;
 	}
 
-	public boolean getStatus() {
+	public boolean succeed() {
 		return mSucceed;
 	}
 
@@ -41,8 +40,8 @@ public class ParkingLog {
 	@Override
 	public String toString() {
 		return java.lang.String.format("%s,%s,%s,%s,%s",
-				getOperation() ? "entrada" : "saída",
-				getStatus() ? "sucesso" : "falha",
+				isEntering() ? "entrada" : "saída",
+				succeed() ? "sucesso" : "falha",
 				Integer.toString(getCarChassis()),
 				Integer.toString(getParkingSpaceID()),
 				Long.toString(getTime()) );
@@ -55,8 +54,8 @@ public class ParkingLog {
 				"\tNúmero de chassi: %d%n" +
 				"\tID da vaga: %d%n" +
 				"\tHorário: %s%n",
-				getOperation() ? "Entrada" : "Saída",
-				getStatus() ? "Sucesso" : "Falha",
+				isEntering() ? "Entrada" : "Saída",
+				succeed() ? "Sucesso" : "Falha",
 				getCarChassis(),
 				getParkingSpaceID(),
 				sdf.format(getTime())

@@ -432,28 +432,21 @@ public class ParkingLot {
 				FileOutputStream fos = new FileOutputStream(filename);
 				PrintWriter writer = new PrintWriter(fos);
 		) {
-			reportAmount(writer, sdf, currentDate);
-
-			// TODO: report about the total amount of cars parked by category(long,short,heavy,light,tall,low,wide,narrow)
-			// O total de veículos estacionados hoje, longos, curtos, pesados, leves, altos, baixos, largos, estreitos.
-			// Um veículo é pesado se tiver peso igual ou superior a 2500 kg. Um veículo é longo se tiver
-			// comprimento igual ou superior a 2,5 metros. Um veículo é largo se tiver largura maior ou igual a 1,6
-			// metros. Um veículo é alto se tiver altura maior ou igual a 1,7 metros.
-
-			// TODO: report about the total amount by decreasing order os specs(weight, height, length, width)
-			// A lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e
-			// largura, nesta ordem. Ou seja, se dois veículos, a e b, pesarem 3500 kg, mas a tem 1,6 m de altura e
-			// b tem 2 m de altura, b deve aparecer antes que a.
-
+			writer.printf("Relatório do dia %s%n===%n%n%n", currentDate);
+			reportAmountPerPS(writer, sdf, currentDate);
+			reportAmountPerCatergory(writer, sdf, currentDate);
+			reportAmountPerSpecs(writer, sdf, currentDate);
 		} catch ( IOException ioe ) {
 			System.out.printf("Não foi possível abrir o arquivo '%s'%n", filename);
 			ioe.printStackTrace();
 		}
 	}
 
-	private void reportAmount(PrintWriter writer, SimpleDateFormat sdf, String date) {
-		writer.printf("Relação da quantidade de carros estacionados por vaga no dia %s%n" +
-				"===%n", date);
+	private void reportAmountPerPS(PrintWriter writer, SimpleDateFormat sdf, String date) {
+	//	Para cada vaga, a quantidade total de veículos que estacionaram nela hoje e o total de tentativas
+	//	falhas de estacionar um veículo nela.
+
+		writer.printf("### Relação da quantidade de carros estacionados por vaga%n");
 		writer.printf("| ID da vaga | Carros estacionados | Tentativas Falhas |%n");
 		writer.printf("| ---------: | :-----------------: | :---------------: |%n");
 		for ( ParkingSpace ps : mParkingSpaces ) {
@@ -461,16 +454,88 @@ public class ParkingLot {
 			int failedParks = 0;
 			for ( ParkingLog parkingLog : mParkingLogs ) {
 				if ( parkingLog.getParkingSpaceID() == ps.getId() &&
-						parkingLog.getOperation() &&
+						parkingLog.isEntering() &&
 						date.equals(sdf.format( parkingLog.getTime() )) ) {
-					if ( parkingLog.getStatus() )
+					if ( parkingLog.succeed() )
 						successParks += 1;
-					else if ( !parkingLog.getStatus() )
+					else if ( !parkingLog.succeed() )
 						failedParks += 1;
 				}
 			}
 			writer.printf("| %d | %d | %d |%n", ps.getId(), successParks, failedParks);
 		}
+		writer.printf("%n%n%n");
+	}
+
+	private void reportAmountPerCatergory(PrintWriter writer, SimpleDateFormat sdf, String date) {
+	// O total de veículos estacionados hoje, longos, curtos, pesados, leves, altos, baixos, largos, estreitos.
+	// Um veículo é pesado se tiver peso igual ou superior a 2500 kg. Um veículo é longo se tiver
+	// comprimento igual ou superior a 2,5 metros. Um veículo é largo se tiver largura maior ou igual a 1,6
+	// metros. Um veículo é alto se tiver altura maior ou igual a 1,7 metros.
+		int longVehicles = 0;
+		int shortVehicles = 0;
+		int heavy = 0;
+		int light = 0;
+		int tall = 0;
+		int low = 0;
+		int wide = 0;
+		int narrow = 0;
+		int grandTotal = 0;
+
+		Set<Car> totalCarsToday = new HashSet<Car>();
+
+		for ( ParkingLog parkingLog : mParkingLogs ) {
+
+			Car car = findCarByChassis(parkingLog.getCarChassis());
+
+			if ( car == null ) continue; // If car doesn't exists
+			if ( !totalCarsToday.add(car) )  continue; // If car has already parked today
+
+			if ( parkingLog.isEntering() && parkingLog.succeed() &&  date.equals(sdf.format(new Date(parkingLog.getTime()) )) )
+			{
+				grandTotal += 1;
+
+				if ( car.getLength() >= 2.50 )
+					longVehicles += 1;
+				else
+					shortVehicles += 1;
+
+				if ( car.getWeight() >= 2500.00 )
+					heavy += 1;
+				else
+					light += 1;
+
+				if ( car.getHeight() >= 1.70 )
+					tall += 1;
+				else
+					low += 1;
+
+				if ( car.getWidth() >= 1.60 )
+					wide += 1;
+				else
+					narrow += 1;
+			}
+		}
+		writer.printf("### Relação da quantidade de carros estacionados por categoria%n");
+		writer.printf("| Total | Longos | Curtos | Pesados | Leves | Altos | Baixos | Largos | Estreitos |%n");
+		writer.printf("| ----: | :----: | :----: | :-----: |  :--: |  :--: | :----: | :----: | :-------: |%n");
+		writer.printf("| %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |%n",   grandTotal,
+																					longVehicles,
+																					shortVehicles,
+																					heavy,
+																					light,
+																					tall,
+																					low,
+																					wide,
+																					narrow
+		);
+	}
+
+	private void reportAmountPerSpecs(PrintWriter writer, SimpleDateFormat sdf, String date) {
+	// TODO: report about the total amount by decreasing order os specs(weight, height, length, width)
+	// A lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e
+	// largura, nesta ordem. Ou seja, se dois veículos, a e b, pesarem 3500 kg, mas a tem 1,6 m de altura e
+	// b tem 2 m de altura, b deve aparecer antes que a.
 	}
 
 	public void run() {
