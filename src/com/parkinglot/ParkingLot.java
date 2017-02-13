@@ -436,6 +436,7 @@ public class ParkingLot {
 			reportAmountPerPS(writer, sdf, currentDate);
 			reportAmountPerCatergory(writer, sdf, currentDate);
 			reportAmountPerSpecs(writer, sdf, currentDate);
+			System.out.printf("Relatório gerado e salvo em '%s'%n", filename);
 		} catch ( IOException ioe ) {
 			System.out.printf("Não foi possível abrir o arquivo '%s'%n", filename);
 			ioe.printStackTrace();
@@ -518,7 +519,7 @@ public class ParkingLot {
 		}
 		writer.printf("### Relação da quantidade de carros estacionados por categoria%n");
 		writer.printf("| Total | Longos | Curtos | Pesados | Leves | Altos | Baixos | Largos | Estreitos |%n");
-		writer.printf("| ----: | :----: | :----: | :-----: |  :--: |  :--: | :----: | :----: | :-------: |%n");
+		writer.printf("| ----: | :----: | :----: | :-----: | :---: | :---: | :----: | :----: | :-------: |%n");
 		writer.printf("| %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |%n",   grandTotal,
 																					longVehicles,
 																					shortVehicles,
@@ -532,10 +533,42 @@ public class ParkingLot {
 	}
 
 	private void reportAmountPerSpecs(PrintWriter writer, SimpleDateFormat sdf, String date) {
-	// TODO: report about the total amount by decreasing order os specs(weight, height, length, width)
 	// A lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e
 	// largura, nesta ordem. Ou seja, se dois veículos, a e b, pesarem 3500 kg, mas a tem 1,6 m de altura e
 	// b tem 2 m de altura, b deve aparecer antes que a.
+
+		Set<Car> totalCarsToday = new HashSet<Car>();
+
+		for ( ParkingLog parkingLog : mParkingLogs ) {
+
+			Car car = findCarByChassis(parkingLog.getCarChassis());
+			if ( car == null ) continue; // If car doesn't exists
+
+			if ( parkingLog.isEntering() && parkingLog.succeed() &&  date.equals(sdf.format(new Date(parkingLog.getTime()) )) )
+			{
+				totalCarsToday.add(car);
+			}
+		}
+
+		List<Car> carList = new ArrayList<Car>(totalCarsToday);
+		carList.sort(new Comparator<Car>() {
+			@Override
+			public int compare(Car o1, Car o2) {
+				return o1.compareTo(o2);
+			}
+		});
+
+		writer.printf("### Lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e largura%n");
+		writer.printf("| Chassí do veículo | Peso | Altura | Comprimento | Largura |%n");
+		writer.printf("| :---------------: | :--: | :----: |  :--------: |  :----: |%n");
+		for (Car c : carList) {
+			writer.printf("| %d | %.2f | %.2f | %.2f | %.2f |%n",
+					c.getChassis(),
+					c.getWeight(),
+					c.getHeight(),
+					c.getLength(),
+					c.getWidth());
+		}
 	}
 
 	public void run() {

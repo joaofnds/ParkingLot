@@ -1,6 +1,6 @@
 package com.parkinglot.model;
 
-public class Car {
+public class Car implements Comparable<Car>{
 	private String mModel;
 	private int mChassis;
 	private double mWeight;
@@ -64,5 +64,31 @@ public class Car {
 											getHeight(),
 											getLength(),
 											getWidth());
+	}
+
+	// Ordenar por ordem decrescente de peso, altura, comprimento e largura
+	@Override
+	public int compareTo(Car o) {
+		if (o == null) {
+			return 0;
+		}
+
+		if (this.getWeight() == o.getWeight()) {
+			if (this.getHeight() == o.getHeight()) {
+				if (this.getLength() == o.getLength()) {
+					if (this.getWidth() == o.getWidth()) {
+						return 0;
+					} else {
+						return this.getWidth() > o.getWidth() ? -1 : 1;
+					}
+				} else {
+					return this.getLength() > o.getLength() ? -1 : 1;
+				}
+			} else {
+				return this.getHeight() > o.getHeight() ? -1 : 1;
+			}
+		} else {
+			return this.getWeight() > o.getWeight() ? -1 : 1;
+		}
 	}
 }
