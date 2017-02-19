@@ -34,18 +34,40 @@ public class ParkingLot {
 		this.mScanner = new Scanner(System.in);
 	}
 
+
+	/**
+	 * Add a Car to mCars list
+	 * @param car Car to be added
+	 */
 	private void addCar(Car car) { this.mCars.add(car); }
 
+	/**
+	 * Add a ParkingSpace to mParkingSpaces list
+	 * @param parkingSpace ParkingSpace to be added
+	 */
 	private void addParkingSpace(ParkingSpace parkingSpace) { this.mParkingSpaces.add(parkingSpace); }
 
+	/**
+	 * Associate a Car chassis to a ParkingSpace ID
+	 * @param chassis Car chassis number
+	 * @param parkingSpaceID ParkingSpace ID
+	 */
 	private void addParkingRelation(int chassis, int parkingSpaceID) {
 		this.mParkingRelations.put(chassis, parkingSpaceID);
 	}
 
+	/**
+	 * Add a ParkingLog to mParkingLogs list
+	 * @param log Log to be added
+	 */
 	private void addParkingLog(ParkingLog log) {
 		mParkingLogs.add(log);
 	}
 
+	/**
+	 * Import Cars to mCars list, from a file
+	 * @param filename path to file
+	 */
 	private void importCarsFrom(String filename) {
 		try (
 				FileInputStream fis = new FileInputStream(filename);
@@ -71,6 +93,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Export Cars from mCars list to a file
+	 * @param filename path to file
+	 */
 	private void exportCarsTo(String filename) {
 		try (
 				FileOutputStream fos = new FileOutputStream(filename);
@@ -85,6 +111,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Import ParkingSpaces to mParkingSpaces, from a file
+	 * @param filename path to file
+	 */
 	private void importParkingSpacesFrom(String filename) {
 		try (
 				FileInputStream fis = new FileInputStream(filename);
@@ -109,6 +139,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Export ParkingSpaces from mParkingSpaces to a file
+	 * @param filename path to file
+	 */
 	private void exportParkingSpacesTo(String filename) {
 		try (
 			FileOutputStream fos = new FileOutputStream(filename);
@@ -123,6 +157,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Import ParkingLogs to mParkingLogs list, from a file
+	 * @param filename path to file
+	 */
 	private void importLogsFrom(String filename) {
 		try (
 				FileInputStream fis = new FileInputStream(filename);
@@ -147,6 +185,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Export ParkingLogs from mParkingLogs to a file
+	 * @param filename path to file
+	 */
 	private void exportLogsTo(String filename) {
 		try (
 				FileOutputStream fos = new FileOutputStream(filename);
@@ -161,6 +203,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Import ParkingRelations to mParkingRelations, from a file
+	 * @param filename path to file
+	 */
 	private void importRelationsFrom(String filename) {
 		try (
 				FileInputStream fis = new FileInputStream(filename);
@@ -180,6 +226,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Export ParkingRelations from mParkingRelations to a file
+	 * @param filename path to file
+	 */
 	private void exportRelationsTo(String filename) {
 		try (
 				FileOutputStream fos = new FileOutputStream(filename);
@@ -195,6 +245,11 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Prompt user actions
+	 * @return User input
+	 * @throws IOException Throws IOException in case of reading failure
+	 */
 	private String promptAction() throws IOException {
 		System.out.println("-------------------------- MENU --------------------------");
 		for (Map.Entry<String, String> option : mMenu.entrySet()) {
@@ -208,6 +263,9 @@ public class ParkingLot {
 		return choice.trim().toLowerCase();
 	}
 
+	/**
+	 * Prompt user for last simulation continuation
+	 */
 	private void promptOpen() {
 
 		System.out.println("Recuperando arquivos de simulação...");
@@ -226,7 +284,7 @@ public class ParkingLot {
 			}
 		} while( !choice.equals("y") && !choice.equals("n") );
 
-		if ( choice == "y" ) {
+		if (choice.equals("y")) {
 			System.out.println("Carros disponíveis para a nova simulação:");
 			showCars(false);
 			showFreeParkingSpaces();
@@ -238,6 +296,10 @@ public class ParkingLot {
 
 	}
 
+	/**
+	 * Prompt user to select a car to un-park
+	 * @return CSV string width 'car chassis number','parking space id'
+	 */
 	private String promptLeave() {
 		showCars(true);
 
@@ -254,22 +316,37 @@ public class ParkingLot {
 		return chassis + "," + ps.getId();
 	}
 
+	/**
+	 * Prompt user for a Car chassis number
+	 * @return User input
+	 */
 	private int promptCarChassis() {
 		System.out.print("Informe o número de chassi do carro: ");
 		return mScanner.nextInt();
 	}
 
+	/**
+	 * Prompt user for a ParkingSpace ID number
+	 * @return User input
+	 */
 	private int promptParkingSpaceID() {
 		System.out.print("Informe o ID da vaga: ");
 		return mScanner.nextInt();
 	}
 
+	/**
+	 * Prompt user for a Car chassis number to be parked at a given ParkingSpace ID
+	 * @return CSV string with 'Car chassis number', 'ParkingSpace ID'
+	 */
 	private String promptParking() {
 		int chassis = promptCarChassis();
 		int psID = promptParkingSpaceID();
 		return chassis + "," + psID;
 	}
 
+	/**
+	 * Prompt user from a Car chassis number and shows the best ParkingSpace for that vehicle
+	 */
 	private void promptSearch() {
 		int chassis = promptCarChassis();
 		Car car = findCarByChassis(chassis);
@@ -284,6 +361,11 @@ public class ParkingLot {
 			System.out.printf("A melhor vaga para seu veículo é:%n%s", bestPS.pretty());
 	}
 
+	/**
+	 * Find a ParkingSpace by his ID number
+	 * @param id ParkingSpace ID to be searched
+	 * @return ParkingSpace if found, null if not found
+	 */
 	private ParkingSpace findParkingSpaceByID(int id) {
 		for ( ParkingSpace ps : this.mParkingSpaces ) {
 			if ( ps.getId() == id ) return ps;
@@ -291,6 +373,11 @@ public class ParkingLot {
 		return null;
 	}
 
+	/**
+	 * Find a ParkingSpace compatible with a given Car
+	 * @param car Car to be parked
+	 * @return ParkingSpace if found, null if not found
+	 */
 	private ParkingSpace findParkingSpaceByCar(Car car) {
 		if ( !isParked(car.getChassis()) )
 			for ( ParkingSpace ps : mParkingSpaces )
@@ -299,12 +386,22 @@ public class ParkingLot {
 		return null;
 	}
 
+	/**
+	 * Finds a ParkingSpace that contains a giver Car
+	 * @param car Car parked at ParkingSpace
+	 * @return ParkingSpace if found, null if not found
+	 */
 	private ParkingSpace findParkingRelationByCar(Car car) {
 		if ( car == null ) return null;
 		int psID = mParkingRelations.get(car.getChassis());
 		return findParkingSpaceByID(psID);
 	}
 
+	/**
+	 * Find a Car by it's chassis number
+	 * @param chassis Car chassis number
+	 * @return Car if found, null if not found
+	 */
 	private Car findCarByChassis(int chassis) {
 		for ( Car car : this.mCars ) {
 			if ( car.getChassis() == chassis )  return car;
@@ -312,6 +409,12 @@ public class ParkingLot {
 		return null;
 	}
 
+	/**
+	 * Checks if a given Car can park at a given ParkingSpace
+	 * @param chassis Car chassis number
+	 * @param parkingSpaceID ParkingSpace ID
+	 * @return true if compatible, false if not compatible
+	 */
 	private boolean isParkable(int chassis, int parkingSpaceID) {
 		Car car = findCarByChassis(chassis);
 
@@ -334,14 +437,28 @@ public class ParkingLot {
 
 	}
 
+	/**
+	 * Checks if a Car it's currently parked
+	 * @param chassis Car chassis number
+	 * @return true if it's currently parked, false if it's not currently parked
+	 */
 	private boolean isParked(int chassis) {
 		return this.mParkingRelations.containsKey(chassis);
 	}
 
+	/**
+	 * Checks if a ParkingSpace it's currently occupied
+	 * @param parkingSpaceID ParkingSpace ID
+	 * @return true if it's currently occupied, false if it's not currently occupied
+	 */
 	private boolean isOccupied(int parkingSpaceID) {
 		return this.mParkingRelations.containsValue(parkingSpaceID);
 	}
 
+	/**
+	 * Print's Car stored in mCars list based on their parking state
+	 * @param parked true if you want to show parked cars, false if you want to show un-parked cars
+	 */
 	private void showCars(boolean parked) {
 		if ( parked )
 			System.out.println("----------------------- Lista de Carros estacionados ---------------------------");
@@ -357,6 +474,9 @@ public class ParkingLot {
 		System.out.println("--------------------------------------------------------------------------------");
 	}
 
+	/**
+	 * Print's to the user all unoccupied ParkingSpaces
+	 */
 	private void showFreeParkingSpaces() {
 		System.out.println("-------------------------- Lista de vagas desocupadas --------------------------");
 		for ( ParkingSpace ps : this.mParkingSpaces ) {
@@ -369,6 +489,10 @@ public class ParkingLot {
 		System.out.println("--------------------------------------------------------------------------------");
 	}
 
+	/**
+	 * Tries to park a car
+	 * @return true if succeeds, false if doesn't succeeds
+	 */
 	private boolean parkCar() {
 		if ( mCars.isEmpty() || mParkingSpaces.isEmpty() ) {
 			System.out.println("Abra o programa primeiro!");
@@ -392,6 +516,10 @@ public class ParkingLot {
 		return true;
 	}
 
+	/**
+	 * Tries to un-park a car
+	 * @return true if succeeds, false if doesn't succeeds
+	 */
 	private boolean unparkCar() {
 		if ( mCars.isEmpty() || mParkingSpaces.isEmpty() ) {
 			System.out.println("Abra o programa primeiro!");
@@ -424,6 +552,10 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Generates Parking Lot reports and writes them to a given file path
+	 * @param filename path to file
+	 */
 	private void generateReport (String filename) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 		String currentDate = sdf.format(new Date().getTime());
@@ -443,6 +575,12 @@ public class ParkingLot {
 		}
 	}
 
+	/**
+	 * Generates a report about the amount of cars that tried to park at every single ParkingSpace, showing succeeded and failed attempts
+	 * @param writer PrintWriter to write the report
+	 * @param sdf SimpleDateFormatter to format dates
+	 * @param date Date of the report
+	 */
 	private void reportAmountPerPS(PrintWriter writer, SimpleDateFormat sdf, String date) {
 	//	Para cada vaga, a quantidade total de veículos que estacionaram nela hoje e o total de tentativas
 	//	falhas de estacionar um veículo nela.
@@ -468,6 +606,12 @@ public class ParkingLot {
 		writer.printf("%n%n%n");
 	}
 
+	/**
+	 * Generates a report abouts the amount of cars that parked at a given date, categorizing them by length, weight, height and width.
+	 * @param writer PrintWriter to write the report
+	 * @param sdf SimpleDateFormatter to format dates
+	 * @param date Date of the report
+	 */
 	private void reportAmountPerCatergory(PrintWriter writer, SimpleDateFormat sdf, String date) {
 	// O total de veículos estacionados hoje, longos, curtos, pesados, leves, altos, baixos, largos, estreitos.
 	// Um veículo é pesado se tiver peso igual ou superior a 2500 kg. Um veículo é longo se tiver
@@ -520,7 +664,7 @@ public class ParkingLot {
 		writer.printf("### Relação da quantidade de carros estacionados por categoria%n");
 		writer.printf("| Total | Longos | Curtos | Pesados | Leves | Altos | Baixos | Largos | Estreitos |%n");
 		writer.printf("| ----: | :----: | :----: | :-----: | :---: | :---: | :----: | :----: | :-------: |%n");
-		writer.printf("| %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |%n",   grandTotal,
+		writer.printf("| %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |  %d |%n%n%n",   grandTotal,
 																					longVehicles,
 																					shortVehicles,
 																					heavy,
@@ -532,6 +676,12 @@ public class ParkingLot {
 		);
 	}
 
+	/**
+	 * Generates a report about the amount of cars that parked today sorted descendingly by weight, height, length and width
+	 * @param writer PrintWrite to write the report
+	 * @param sdf SimpleDateFormatter to format dates
+	 * @param date Date of the report
+	 */
 	private void reportAmountPerSpecs(PrintWriter writer, SimpleDateFormat sdf, String date) {
 	// A lista de veículos que já estacionaram hoje, em ordem decrescente de peso, altura, comprimento e
 	// largura, nesta ordem. Ou seja, se dois veículos, a e b, pesarem 3500 kg, mas a tem 1,6 m de altura e
@@ -569,8 +719,12 @@ public class ParkingLot {
 					c.getLength(),
 					c.getWidth());
 		}
+		writer.printf("%n%n%n");
 	}
 
+	/**
+	 * Runs the ParkingLot code using a Menu system
+	 */
 	public void run() {
 		String choice = "";
 		do {
